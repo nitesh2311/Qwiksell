@@ -9,7 +9,11 @@
 		$tmpName=$_FILES["image".$index]["tmp_name"];
 		$filePath="images/".$_FILES["image".$index]["name"];
 		
+<<<<<<< HEAD
 		//////move_uploaded_file($_FILES["image"]["tmp_name"], "$folder".$_FILES["image"]["name"]);
+=======
+		//move_uploaded_file($_FILES["image"]["tmp_name"], "$folder".$_FILES["image"]["name"]);
+>>>>>>> a16c38d1c180fdfea103281baed27de4f423858b
 
 		$result = move_uploaded_file($tmpName, $filePath);
 		$orig_image = imagecreatefromjpeg($filePath);
