@@ -1,7 +1,10 @@
 <?php 
 	include("config.php");
 	include("session.php");
-
+	 $myusername=$_SESSION['login_user'];
+    $user=mysqli_fetch_array(mysqli_query($db, "select * from user where User_ID='$myusername';"));
+	$eid_profile=mysqli_fetch_array(mysqli_query($db, "select * from eid_profilepic where User_ID='$myusername';"));
+	
 ?>
 <html style="height: 100%;">
 <meta charset="UTF-8">
@@ -16,25 +19,47 @@
 <body>
 	<div class="container-fluid">
 		<div class="row content" style=" background-color:#001933;">
-			<br>
-			<div class="col-md-1" >
+			
+			<!-- <div class="col-md-1" >
 				<img src="profile.png" alt="profile pic">
+			</div> -->
+			<div class="col-md-1" >
+				<br>
+				<a href="ad.php" class="btn btn-primary" role="button">Post Ad</a>
 			</div>
 			<div class="col-md-9"></div>
 			<div class="col-md-1" >
 				<div class="dropdown">
-					<button class="btn btn-primary dropdown-toggle" type="button" data-toggle="dropdown">Batista
+					<br>
+					<button class="btn btn-primary dropdown-toggle" type="button" data-toggle="dropdown"><?php echo $user['Username'] ?>
 						<span class="caret"></span>
 					</button>
 					<ul class="dropdown-menu pull-right">
-					  <li><a href="#">My Profile</a></li>
+					  <li><a href="profile.php">My Profile</a></li>
 					  <li><a href="#">My Dashboard</a></li>
-					  <li><a href="qwiksell.php">Logout</a></li>
+					  <li><a href="logout.php">Logout</a></li>
 					</ul>
 				</div>
 			</div>
 			<div class="col-md-1" >
-				<img src="profile.png" alt="profile pic">
+				
+				<?php
+				if (is_null($eid_profile['Profilepic'])){
+					echo '<img src="profile.png" alt="profile pic">';
+				}
+				else{
+					$query = "select Profilepic from eid_profilepic where User_ID='$myusername';";
+					$result = mysqli_query($db, $query);
+					while ($row = mysqli_fetch_array($result))
+					{	echo'
+						<tr>
+							<td>
+								<img src="data:image/jpeg;base64,'.base64_encode($row['Profilepic']).'"/>
+							</td>
+						</tr>';
+					}
+				}	
+				?>
 			</div>
 		</div>
 		<div class="row content" style=" background-color:#2e353d;">

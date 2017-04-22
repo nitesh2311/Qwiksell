@@ -2,9 +2,7 @@
 	include("config.php");
     include("session.php");
     $myusername=$_SESSION['login_user'];
-    $user=mysqli_fetch_array(mysqli_query($db, "select * from user where User_ID='$myusername';"));
-	$eid_profile=mysqli_fetch_array(mysqli_query($db, "select * from eid_profilepic where User_ID='$myusername';"));
-					
+    				
 
 	function resizeandUpload(){
       	include("config.php");
@@ -22,8 +20,8 @@
 		$width_orig  = $image_info[0]; // current width as found in image file
 		$height_orig = $image_info[1]; // current height as found in image file
 		//echo $width_orig, $height_orig;
-		$width = 200; // new image width
-		$height = 150; // new image height
+		$width = 80; // new image width
+		$height = $height_orig*80/$width_orig; // new image height
 		$destination_image = imagecreatetruecolor($width, $height);
 		imagecopyresampled($destination_image, $orig_image, 0, 0, 0, 0, $width, $height, $width_orig, $height_orig);
 		// This will just copy the new image over the original at the same filePath.
@@ -69,10 +67,13 @@
 				  where User_ID='$myusername';";
 	     
 	      $ress1=mysqli_query($db,$sql);
-	      $user=mysqli_fetch_array(mysqli_query($db, "select * from user where User_ID='$myusername';"));
-		  $eid_profile=mysqli_fetch_array(mysqli_query($db, "select * from eid_profilepic where User_ID='$myusername';"));
+	      //$user=mysqli_fetch_array(mysqli_query($db, "select * from user where User_ID='$myusername';"));
+		  //$eid_profile=mysqli_fetch_array(mysqli_query($db, "select * from eid_profilepic where User_ID='$myusername';"));
 	
-		}				
+		}	
+	$user=mysqli_fetch_array(mysqli_query($db, "select * from user where User_ID='$myusername';"));
+	$eid_profile=mysqli_fetch_array(mysqli_query($db, "select * from eid_profilepic where User_ID='$myusername';"));
+				
 ?>
 
 <html style="height: 100%;">
@@ -87,25 +88,47 @@
 <body>
 	<div class="container-fluid">
 		<div class="row content" style=" background-color:#001933;">
-			<br>
-			<div class="col-md-1" >
+			
+			<!-- <div class="col-md-1" >
 				<img src="profile.png" alt="profile pic">
+			</div> -->
+			<div class="col-md-1" >
+				<br>
+				<a href="ad.php" class="btn btn-primary" role="button">Post Ad</a>
 			</div>
 			<div class="col-md-9"></div>
 			<div class="col-md-1" >
 				<div class="dropdown">
-					<button class="btn btn-primary dropdown-toggle" type="button" data-toggle="dropdown">Batista
+					<br>
+					<button class="btn btn-primary dropdown-toggle" type="button" data-toggle="dropdown"><?php echo $user['Username'] ?>
 						<span class="caret"></span>
 					</button>
 					<ul class="dropdown-menu pull-right">
-					  <!-- <li><a href="profile.php">My Profile</a></li> -->
+					  <li><a href="profile.php">My Profile</a></li>
 					  <li><a href="#">My Dashboard</a></li>
 					  <li><a href="logout.php">Logout</a></li>
 					</ul>
 				</div>
 			</div>
 			<div class="col-md-1" >
-				<img src="profile.png" alt="profile pic">
+				
+				<?php
+				if (is_null($eid_profile['Profilepic'])){
+					echo '<img src="profile.png" alt="profile pic">';
+				}
+				else{
+					/*$query = "select * from eid_profilepic where User_ID='$myusername';";
+					$result = mysqli_query($db, $query);
+					while ($row = mysqli_fetch_array($result))
+					{*/	echo'
+						<tr>
+							<td>
+								<img src="data:image/jpeg;base64,'.base64_encode($eid_profile['Profilepic']).'"/>
+							</td>
+						</tr>';
+					//}
+				}	
+				?>
 			</div>
 		</div>
 	</div>
@@ -217,16 +240,16 @@
 														</form>';	
 											}
 											else {
-												$query = "select Profilepic from eid_profilepic where User_ID='$myusername';";
+												/*$query = "select Profilepic from eid_profilepic where User_ID='$myusername';";
 												$result = mysqli_query($db, $query);
 												while ($row = mysqli_fetch_array($result))
-												{	echo'
+												{*/	echo'
 													<tr>
 														<td>
-															<img src="data:image/jpeg;base64,'.base64_encode($row['Profilepic']).'"/>
+															<img src="data:image/jpeg;base64,'.base64_encode($eid_profile['Profilepic']).'"/>
 														</td>
 													</tr>';
-												}
+												//}
 											}	
 											
 										?>

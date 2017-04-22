@@ -1,6 +1,30 @@
 <?php
-   include('session.php');
-   include('config.php');
+    include("config.php");
+    include("session.php");
+    
+	$sql1='';
+	$Category=array('Electronics-Cooler','Electronics-Laptop','Electronics-Moblie','Electronics-Air Conditioner','Electronics-Others','Books-Novel','Books-Textbook','Books-Others','Vehicles-Car','Vehicles-Bicycle','Vehicles-Bike','Vehiles-Others','Others');
+	$category=array('cooler','laptop','moblie','ac','elec-othrs','novel','txtbook','book-othrs','car','bicycle','bike','vehicles-othrs','others');
+	$i=0;
+	while($i<13){
+		
+		if (isset($_GET[$category[$i]])){
+			$sql1=" where Category='".$Category[$i]."'";
+			//echo "<h3>others</h3>";
+		}
+
+		$i=$i+1;
+	}
+
+
+
+	$table=mysqli_query($db, "select Product_ID,Product_Name,Category,Decription,Expected_Price from Product".$sql1.";");
+	$tt=mysqli_query($db, "select Image1 from Product".$sql1.";");
+	
+	$myusername=$_SESSION['login_user'];
+    $user=mysqli_fetch_array(mysqli_query($db, "select * from user where User_ID='$myusername';"));
+	$eid_profile=mysqli_fetch_array(mysqli_query($db, "select * from eid_profilepic where User_ID='$myusername';"));
+	
 ?>
 
 
@@ -18,17 +42,17 @@
 <body>
 	<div class="container-fluid">
 		<div class="row content" style=" background-color:#001933;">
-			<br>
+			
+			
 			<div class="col-md-1" >
-				<img src="profile.png" alt="profile pic">
+				<br>
+				<a href="ad.php" class="btn btn-primary" role="button">Post Ad</a>
 			</div>
-			<div class="col-md-1" >
-				<a href="ad.php" class="btn btn-primary" role="button">Post</a>
-			</div>
-			<div class="col-md-8"></div>
+			<div class="col-md-9"></div>
 			<div class="col-md-1" >
 				<div class="dropdown">
-					<button class="btn btn-primary dropdown-toggle" type="button" data-toggle="dropdown">Batista
+					<br>
+					<button class="btn btn-primary dropdown-toggle" type="button" data-toggle="dropdown"><?php echo $user['Username'] ?>
 						<span class="caret"></span>
 					</button> 
 					<ul class="dropdown-menu pull-right">
@@ -39,7 +63,24 @@
 				</div>
 			</div>
 			<div class="col-md-1" >
-				<img src="profile.png" alt="profile pic">
+				
+				<?php
+				if (is_null($eid_profile['Profilepic'])){
+					echo '<img src="profile.png" alt="profile pic">';
+				}
+				else{
+					/*$query = "select Profilepic from eid_profilepic where User_ID='$myusername';";
+					$result = mysqli_query($db, $query);
+					while ($row = mysqli_fetch_array($result))
+					{*/	echo'
+						<tr>
+							<td>
+								<img src="data:image/jpeg;base64,'.base64_encode($eid_profile['Profilepic']).'"/>
+							</td>
+						</tr>';
+					//}
+				}	
+				?>
 			</div>
 		</div>
 		<div class="row content" style=" background-color:#2e353d;">
@@ -49,28 +90,30 @@
 					<input type="text" name="search" placeholder="Search..">
 				</form>
 				<br><br>
+				<form method="post">
 				<ul class="nav nav-pills nav-stacked">
-					<li class="active"><a href="#">Home</a></li>
+					
+					<li class="active"><a href="welcome.php" >Home</a></li>
 					<li class="dropdown">
-						<a class="dropdown-toggle" data-toggle="dropdown" href="#">Electronics
+						<a class="dropdown-toggle" data-toggle="dropdown"  href="#">Electronics
 							<span class="caret"></span>
 						</a>
 						<ul class="dropdown-menu">
-							<li><a href="#">Cooler</a></li>
-							<li><a href="#">Laptop</a></li>
-							<li><a href="#">Mobile</a></li>
-							<li><a href="#">Air Conditioner</a></li>							
-							<li><a href="#">Others</a></li>
+							<li><a href="?cooler=true" >Cooler</a></li>
+							<li><a href="?laptop=true">Laptop</a></li>
+							<li><a href="?mobile=true">Mobile</a></li>
+							<li><a href="?ac=true">Air Conditioner</a></li>							
+							<li><a href="?elec-othrs=true">Others</a></li>
 						</ul>
 					</li>
 					<li class="dropdown">
-						<a class="dropdown-toggle" data-toggle="dropdown" href="#">Books
+						<a class="dropdown-toggle" data-toggle="dropdown" name="books" href="#">Books
 							<span class="caret"></span>
 						</a>
 						<ul class="dropdown-menu">
-							<li><a href="#">Novel</a></li>
-							<li><a href="#">Textbook</a></li>							
-							<li><a href="#">Others</a></li>
+							<li><a href="?novel=true">Novel</a></li>
+							<li><a href="?txtbook=true">Textbook</a></li>							
+							<li><a href="?book-othrs=true">Others</a></li>
 						</ul>
 					</li>
 					<li class="dropdown">
@@ -78,29 +121,22 @@
 							<span class="caret"></span>
 						</a>
 						<ul class="dropdown-menu">
-							<li><a href="#">Car</a></li>
-							<li><a href="#">Bicycle</a></li>
-							<li><a href="#">Bike</a></li>							
-							<li><a href="#">Others</a></li>
+							<li><a href="?car=true">Car</a></li>
+							<li><a href="?bicycle=true">Bicycle</a></li>
+							<li><a href="?bike=true">Bike</a></li>							
+							<li><a href="?vehicles-othrs=true">Others</a></li>
 						</ul>
 					</li>
-					<li><a href="#">Others</a></li>
+					
+					<li><a href="?others=true" >Others</a></li>
+					
 				</ul>
+				</form>
 			</div>
 			<div class="col-md-10" style=" background-color:#FFFFF0;">	
 				<br>
 				<?php
-					$table = array();
-					$Imagearray=array();
-					$index=0;
-
-					/*while($res=){
-						$table[$index]=$res;
-						$index++;
-					}*/
 					
-					$table=mysqli_query($db, "select Product_ID,Product_Name,Category,Decription,Expected_Price from Product;");
-					$tt=mysqli_query($db, "select Image1 from Product;");
 					while($row=mysqli_fetch_array($table)){
 						
 						//$_SESSION['product_id']=$Product_ID;
