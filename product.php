@@ -1,7 +1,31 @@
 <?php 
 	include("config.php");
 	include("session.php");
-	 $myusername=$_SESSION['login_user'];
+	
+	$sql1='';
+	$Category=array('Electronics-Cooler','Electronics-Laptop','Electronics-Moblie','Electronics-Air Conditioner','Electronics-Others','Books-Novel','Books-Textbook','Books-Others','Vehicles-Car','Vehicles-Bicycle','Vehicles-Bike','Vehiles-Others','Others');
+	$category=array('cooler','laptop','moblie','ac','elec-othrs','novel','txtbook','book-othrs','car','bicycle','bike','vehicles-othrs','others');
+	$i=0;
+	while($i<13){
+		
+		if (isset($_GET[$category[$i]])){
+			$sql1=" where Category='".$Category[$i]."'";
+			//echo "<h3>others</h3>";
+		}
+
+		$i=$i+1;
+	}
+
+	$table=mysqli_query($db, "select Product_ID,Product_Name,Category,Decription,Expected_Price from Product".$sql1.";");
+	$tt=mysqli_query($db, "select Image1 from Product".$sql1.";");
+
+	if (isset($_POST['submitforsearch'])){
+		/*echo "<h3>",$_POST['cgory'],"</h3>";
+		$sql1=" where Category='".$_POST['cgory']."'";*/
+		header("location: welcome.php?".$_POST['cgory']."=true&search=".$_POST['search']."");
+	}
+	
+	$myusername=$_SESSION['login_user'];
     $user=mysqli_fetch_array(mysqli_query($db, "select * from user where User_ID='$myusername';"));
 	$eid_profile=mysqli_fetch_array(mysqli_query($db, "select * from eid_profilepic where User_ID='$myusername';"));
 	
@@ -20,20 +44,50 @@
 	<div class="container-fluid">
 		<div class="row content" style=" background-color:#001933;">
 			
-			<!-- <div class="col-md-1" >
-				<img src="profile.png" alt="profile pic">
-			</div> -->
 			<div class="col-md-1" >
 				<br>
 				<a href="ad.php" class="btn btn-primary" role="button">Post Ad</a>
 			</div>
-			<div class="col-md-9"></div>
+			<div class="col-md-1"></div>
+			<form method="post">
+				<div class="col-md-3">
+					<br>
+					<select class="form-control" name="cgory" id="cgory">
+						<option>Select Category for Search...</option>
+						<option>Others</option>
+						<option>Electronics-Cooler</option>
+						<option>Electronics-Air Conditioner</option>
+						<option>Electronics-Laptop</option>
+						<option>Electronics-Mobile</option>
+						<option>Electronics-Others</option>
+						<option>Vehicles-Car</option>
+						<option>Vehicles-Bike</option>
+						<option>Vehicles-Bicycle</option>
+						<option>Vehicles-Others</option>
+						<option>Books-Novel</option>
+						<option>Books-Textbook</option>
+						<option>Books-Others</option>
+					</select>
+				</div>	
+				<div class="col-md-2">
+					<br>
+
+					<input type="text" name="search" id="search" placeholder="Search..">
+				</div>
+				<div class="col-md-1">
+					<br>	
+					<div class="text-center">
+						<input class="btn btn-primary" type="submit" name="submitforsearch" value="Search" align="left" style="background-color:#001933;">
+					</div>
+				</div>	
+			
+			<div class="col-md-2"></div>
 			<div class="col-md-1" >
 				<div class="dropdown">
 					<br>
 					<button class="btn btn-primary dropdown-toggle" type="button" data-toggle="dropdown"><?php echo $user['Username'] ?>
 						<span class="caret"></span>
-					</button>
+					</button> 
 					<ul class="dropdown-menu pull-right">
 					  <li><a href="profile.php">My Profile</a></li>
 					  <li><a href="#">My Dashboard</a></li>
@@ -48,19 +102,20 @@
 					echo '<img src="profile.png" alt="profile pic">';
 				}
 				else{
-					$query = "select Profilepic from eid_profilepic where User_ID='$myusername';";
+					/*$query = "select Profilepic from eid_profilepic where User_ID='$myusername';";
 					$result = mysqli_query($db, $query);
 					while ($row = mysqli_fetch_array($result))
-					{	echo'
+					{*/	echo'
 						<tr>
 							<td>
-								<img src="data:image/jpeg;base64,'.base64_encode($row['Profilepic']).'"/>
+								<img src="data:image/jpeg;base64,'.base64_encode($eid_profile['Profilepic']).'"/>
 							</td>
 						</tr>';
-					}
+					//}
 				}	
 				?>
 			</div>
+			</form>
 		</div>
 		<div class="row content" style=" background-color:#2e353d;">
 			<div class="col-md-2" style=" background-color:#2e353d;">
@@ -76,11 +131,11 @@
 							<span class="caret"></span>
 						</a>
 						<ul class="dropdown-menu">
-							<li><a href="#">Cooler</a></li>
-							<li><a href="#">Laptop</a></li>
-							<li><a href="#">Mobile</a></li>
-							<li><a href="#">Air Conditioner</a></li>							
-							<li><a href="#">Others</a></li>
+							<li><a href="welcome.php?cooler=true" >Cooler</a></li>
+							<li><a href="welcome.php?laptop=true">Laptop</a></li>
+							<li><a href="welcome.php?mobile=true">Mobile</a></li>
+							<li><a href="welcome.php?ac=true">Air Conditioner</a></li>							
+							<li><a href="welcome.php?elec-othrs=true">Others</a></li>
 						</ul>
 					</li>
 					<li class="dropdown">
@@ -88,9 +143,9 @@
 							<span class="caret"></span>
 						</a>
 						<ul class="dropdown-menu">
-							<li><a href="#">Novel</a></li>
-							<li><a href="#">Textbook</a></li>							
-							<li><a href="#">Others</a></li>
+							<li><a href="welcome.php?novel=true">Novel</a></li>
+							<li><a href="welcome.php?txtbook=true">Textbook</a></li>							
+							<li><a href="welcome.php?book-othrs=true">Others</a></li>
 						</ul>
 					</li>
 					<li class="dropdown">
@@ -98,13 +153,14 @@
 							<span class="caret"></span>
 						</a>
 						<ul class="dropdown-menu">
-							<li><a href="#">Car</a></li>
-							<li><a href="#">Bicycle</a></li>
-							<li><a href="#">Bike</a></li>							
-							<li><a href="#">Others</a></li>
+							<li><a href="welcome.php?car=true">Car</a></li>
+							<li><a href="welcome.php?bicycle=true">Bicycle</a></li>
+							<li><a href="welcome.php?bike=true">Bike</a></li>							
+							<li><a href="welcome.php?vehicles-othrs=true">Others</a></li>
+						</ul>
 						</ul>
 					</li>
-					<li><a href="#">Others</a></li>
+					<li><a href="welcome.php?others=true">Others</a></li>
 				</ul>
 			</div>
 			<div class="col-md-10" style=" background-color:#FFFFF0;">	

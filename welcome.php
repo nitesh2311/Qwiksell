@@ -8,7 +8,7 @@
 	$i=0;
 	while($i<13){
 		
-		if (isset($_GET[$category[$i]])){
+		if (isset($_GET[$category[$i]]) || isset($_GET[$Category[$i]])){
 			$sql1=" where Category='".$Category[$i]."'";
 			//echo "<h3>others</h3>";
 		}
@@ -16,10 +16,15 @@
 		$i=$i+1;
 	}
 
-
-
 	$table=mysqli_query($db, "select Product_ID,Product_Name,Category,Decription,Expected_Price from Product".$sql1.";");
 	$tt=mysqli_query($db, "select Image1 from Product".$sql1.";");
+
+	if (isset($_POST['submitforsearch'])){
+		/*echo "<h3>",$_POST['cgory'],"</h3>";
+		$sql1=" where Category='".$_POST['cgory']."'";*/
+		header("location: welcome.php?".$_POST['cgory']."=true&search=".$_POST['search']."");
+	}
+
 	
 	$myusername=$_SESSION['login_user'];
     $user=mysqli_fetch_array(mysqli_query($db, "select * from user where User_ID='$myusername';"));
@@ -48,7 +53,40 @@
 				<br>
 				<a href="ad.php" class="btn btn-primary" role="button">Post Ad</a>
 			</div>
-			<div class="col-md-9"></div>
+			<div class="col-md-1"></div>
+			<form method="post">
+				<div class="col-md-3">
+					<br>
+					<select class="form-control" name="cgory" id="cgory">
+						<option>Select Category for Search...</option>
+						<option>Others</option>
+						<option>Electronics-Cooler</option>
+						<option>Electronics-Air Conditioner</option>
+						<option>Electronics-Laptop</option>
+						<option>Electronics-Mobile</option>
+						<option>Electronics-Others</option>
+						<option>Vehicles-Car</option>
+						<option>Vehicles-Bike</option>
+						<option>Vehicles-Bicycle</option>
+						<option>Vehicles-Others</option>
+						<option>Books-Novel</option>
+						<option>Books-Textbook</option>
+						<option>Books-Others</option>
+					</select>
+				</div>	
+				<div class="col-md-2">
+					<br>
+
+					<input type="text" name="search" id="search" placeholder="Search..">
+				</div>
+				<div class="col-md-1">
+					<br>	
+					<div class="text-center">
+						<input class="btn btn-primary" type="submit" name="submitforsearch" value="Search" align="left" style="background-color:#001933;">
+					</div>
+				</div>	
+			
+			<div class="col-md-2"></div>
 			<div class="col-md-1" >
 				<div class="dropdown">
 					<br>
@@ -82,15 +120,14 @@
 				}	
 				?>
 			</div>
+			</form>
 		</div>
 		<div class="row content" style=" background-color:#2e353d;">
 			<div class="col-md-2" style=" background-color:#2e353d;">
 				<br><br>
-				<form>
-					<input type="text" name="search" placeholder="Search..">
-				</form>
-				<br><br>
-				<form method="post">
+				
+				
+				<!-- <form method="post"> -->
 				<ul class="nav nav-pills nav-stacked">
 					
 					<li class="active"><a href="welcome.php" >Home</a></li>
@@ -131,16 +168,27 @@
 					<li><a href="?others=true" >Others</a></li>
 					
 				</ul>
-				</form>
+				<!-- </form> -->
 			</div>
 			<div class="col-md-10" style=" background-color:#FFFFF0;">	
 				<br>
 				<?php
-					
+					$check=0;
 					while($row=mysqli_fetch_array($table)){
-						
+						$search='';
 						//$_SESSION['product_id']=$Product_ID;
+						if (isset($_GET['search'])){
+							if ($_GET['search'] !=''){
+								if (strlen(stristr($row['Product_Name'],$_GET['search']))<=0) {
+								   //echo "<h3>",$row['Product_Name']," ",$_GET['search'],"</h3>";
+								    continue;
+								}
+
+							}
+						}
+						$check=1;
 						$Img=mysqli_fetch_array($tt);	
+						
 						echo '<div class="row content">
 								<div class="col-md-4">	
 									<div class="thumbnail">
@@ -175,7 +223,10 @@
 							<hr>';
 
 							
-					}		
+					}	
+					if ($check==0){
+						echo "<h4>Not Found..</h4>";
+					}	
 					
 					
 				?>
